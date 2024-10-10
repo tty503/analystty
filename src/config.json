@@ -1,0 +1,7 @@
+{
+	"DEFAULT":
+	{
+		"MALAPI_PATH" : "src\\malapi.json",
+		"PEID_DB" : "src\\userdb.txt" 	
+	}
+}

@@ -1,0 +1,12 @@
+Metadata-Version: 2.1
+Name: peutils
+Version: 0.0.111
+Summary: utils for text,audio,video,excel,file and so on.
+Home-page: https://github.com/yunsansheng/peutils
+Author: henry.wang
+Author-email: shanandone@qq.com
+License: MIT Licence
+Keywords: pip3,peutils,henry
+Platform: any
+
+utils for text,audio,video,excel,file and so on,more details please visit gitlab.
