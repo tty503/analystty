@@ -8,10 +8,21 @@ import analystty
 
 def print_tables(reorg, max_rows=10):
     keys = list(reorg.keys())
-    for i in range(0, len(keys), max_rows):
+    for i in range(0, len(keys), max_rows):        
         chunk = {k: reorg[k] for k in keys[i:i + max_rows]}
         print(tabulate(chunk, headers='keys', tablefmt='grid'))
         print('\n')
+def print_reorg(lists, key, value):
+    reorg = {}
+    for j in lists:
+        for k in lists:
+            if j[key] == k[key]:
+                if j[key] not in reorg:
+                    reorg[j[key]] = []
+        # Idear un metodo para formatear de esta manera : 
+        #reorg[j['START']].append(f"{j['NAME']}.{j['DLL']}\n\nrax : {j['AVA']}\n{j['INSTRUCTION']}")
+        reorg[j[key]].append(j[value])
+    print_tables(reorg, 7)
 
 if __name__ == "__main__":
     pe = pefile.PE("data\\PE64\\test1.exe")
@@ -73,12 +84,5 @@ if __name__ == "__main__":
     print(tabulate(lists, headers='keys', tablefmt='grid'))
 
     lists = obj.getFunctionsByMalApiDetect()
-    print(tabulate(lists, headers='keys', tablefmt='grid'))
-    reorg = {}
-    for j in lists:
-        for k in lists:
-            if j['START'] == k['START']:
-                if j['START'] not in reorg:
-                    reorg[j['START']] = []
-        reorg[j['START']].append(j['NAME'])
-    print_tables(reorg, 7)
+    #print(tabulate(lists, headers='keys', tablefmt='grid'))
+    print_reorg(lists, 'START', 'NAME')

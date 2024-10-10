@@ -122,13 +122,6 @@ class frm_pe:
 				})
 				function_start_addr = 0x0
 				function_end_addr   = 0x0
-	def getInfoPe(self):
-		return[{
-			'TYPE'        : self.__type, 
-			'MAGIC'       : self.__magic,
-			'ENTRY_POINT' : hex(self.__entrypoint),
-			'EP_AVA'      : hex(self.__ep_ava)
-		}]
 	def __CalcOffsetFuncs(self):
 		matches  = []
 		previous = None
@@ -143,13 +136,23 @@ class frm_pe:
 					start = address
 				elif mnemonic == 'ret':
 					start = None 
-			
+					# Considerar otras formas de saltar, como condicionales jne/jz/jnz... y push/push/ret.
+					# Es importante hacerse una logica aparte para encontrar este tipo de patrones. 
+					# Tambien debe contemplarse los far call. 
 				if mnemonic in ['call', 'jmp']:
+					# Agregar la capacidad de distinguir otros registros, la misma logica es usada para 
+					# ubicar los argumentos que son cargandos en la funcion. Ademas, debe tener la capacidad
+					# de adaptarse en caso de que sea 32 bits.
 					if operands == 'rax':
 						match = re.search(r'\[rip\s*([\+\-])\s*0x([0-9a-fA-F]+)\]', previous['OPERATORS'])
 					else:
 						match = re.search(r'\[rip\s*([\+\-])\s*0x([0-9a-fA-F]+)\]', operands)
 					if match:
+						# No hemos considerado la posibilidad de que use mas elementos para calcular el offset
+						# debemos poder detectar cuando se esta realizan un calculo de offset.
+						# Una idea podria ser encontrar la instruccion call equivalente, identificar el registro
+						# en donde se carga la direccion calculada y tracear hacia atras para saber que valores 
+						# estuvieron involucrados en el calculo. 
 						offset = int(match.group(1) + match.group(2), 16)
 						address = hex(int(address, 16) + offset)
 						matches.append({
@@ -175,6 +178,13 @@ class frm_pe:
 							})
 				previous = instruction
 		return matches
+	def getInfoPe(self):
+		return[{
+			'TYPE'        : self.__type, 
+			'MAGIC'       : self.__magic,
+			'ENTRY_POINT' : hex(self.__entrypoint),
+			'EP_AVA'      : hex(self.__ep_ava)
+		}]
 	def getSections(self):
 		return self.__sections
 	def getImports(self):
@@ -183,8 +193,6 @@ class frm_pe:
 		return self.__funcs
 	def getMalApiDetect(self):
 		return self.__malApiDetect
-
-		# Ordenar las importaciones dentro de las funciones que la usan 
 	def getFunctionsByImports(self):
 		funcsByImports = []
 		funcs_calcs    = self.__CalcOffsetFuncs()
@@ -192,8 +200,6 @@ class frm_pe:
 			if func_calc['START'] != None:
 				funcsByImports.append(func_calc)
 		return funcsByImports
-
-		# Ordenar las importaciones relacionadas con el malware en las funciones que la usan
 	def getFunctionsByMalApiDetect(self):
 		funcsByMalApiOrdened = []
 		funcs_calcs    = self.__CalcOffsetFuncs()
@@ -210,6 +216,7 @@ class frm_pe:
 							'DLL'         : malapi['DLL']
 						})
 		return funcsByMalApiOrdened
+
 
 
 
