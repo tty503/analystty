@@ -143,10 +143,7 @@ class frm_pe:
     def getFuncs(self):
         return self.__funcs_addr
 
-    #mov  rax, qword ptr [rip + 0x6e55] 
-    # Para calcular esto necesito la direccion rip (de la instruccion del call) y sumarle el valor
-    # esto me dara la direccion en donde esta ubicada la direccion exportada
-    #call rax    
+
     def getFuncAddrs(self):
         matches = []
 
