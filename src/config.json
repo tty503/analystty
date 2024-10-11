@@ -2,6 +2,8 @@
 	"DEFAULT":
 	{
 		"MALAPI_PATH" : "src\\malapi.json",
-		"PEID_DB" : "src\\userdb.txt" 	
+		"PEID_DB"     : "src\\userdb.txt",
+		"ADDR_DBG"    : "127.0.0.1",
+		"PORT_DBG"    : 6589 	
 	}
 }

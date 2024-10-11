@@ -86,3 +86,14 @@ if __name__ == "__main__":
     lists = obj.getFunctionsByMalApiDetect()
     #print(tabulate(lists, headers='keys', tablefmt='grid'))
     print_reorg(lists, 'START', 'NAME')
+
+
+    test = analystty.medbg(obj)
+    for point in lists:
+        ret = test.setBpList(int(point['ADDR'], 16))
+        if ret:
+            print(f'{point['NAME']} : OK')
+        else:
+            print('ERROR')
+
+

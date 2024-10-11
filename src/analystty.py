@@ -6,6 +6,8 @@ from capstone import *
 
 import re
 
+from x64dbg import Debugger
+
 class frm_pe:
 	def __init__(self, pe, config = 'DEFAULT'):
 		self.__pe           = pe
@@ -13,8 +15,9 @@ class frm_pe:
 		self.__type         = 'PE64' if pe.FILE_HEADER.Machine == 0x8664 else 'PE32'
 		self.__magic        = hex(pe.DOS_HEADER.e_magic) 
 		self.__entrypoint   = pe.OPTIONAL_HEADER.AddressOfEntryPoint
+		self.__imageBase    = pe.OPTIONAL_HEADER.ImageBase
 				# Entry Point Address Virtual Allocation
-		self.__ep_ava       = self.__entrypoint + pe.OPTIONAL_HEADER.ImageBase
+		self.__ep_ava       = self.__entrypoint + self.__imageBase
 		self.__basepointer  = 'rbp' if self.__type == 'PE64' else 'ebp'
 		
 		self.__sections     = []
@@ -216,7 +219,34 @@ class frm_pe:
 							'DLL'         : malapi['DLL']
 						})
 		return funcsByMalApiOrdened
+	def getImageBase(self):
+		return self.__imageBase
 
+class medbg:
+	def __init__(self, analystty, config = 'DEFAULT'):
+		self.__analystty = analystty
+		with open('src\\config.json', 'r') as f:
+			data = json.load(f)
 
+		self.__config = data[config]
+		self.__dbg    = Debugger(address = self.__config['ADDR_DBG'], 
+								 port = self.__config['PORT_DBG'])
+		self.__dbg.connect()
 
+			# Instruction Pointer 
+		self.__ip          = hex(self.__dbg.get_eip()) if self.__dbg.connect() == True else None
+		self.__baseAddr    = hex(self.__dbg.get_main_module_base()) if self.__dbg.connect() == True else None
+		self.__breakpoints = []
 
+	def __mappingPhysicalAddress(self, ava):
+		phyAddr = ava - self.__analystty.getImageBase()
+		phyAddr = int(self.__baseAddr, 16) + phyAddr 
+		return phyAddr
+
+	def setBpList(self, bp):
+		bp  = self.__mappingPhysicalAddress(bp)
+		ret = self.__dbg.set_breakpoint(bp)
+		if ret:
+			return True
+		else:
+			return False
