@@ -231,11 +231,11 @@ class medbg:
 		self.__config = data[config]
 		self.__dbg    = Debugger(address = self.__config['ADDR_DBG'], 
 								 port = self.__config['PORT_DBG'])
-		self.__dbg.connect()
+		self.__status = self.__dbg.connect()
 
 			# Instruction Pointer 
-		self.__ip          = hex(self.__dbg.get_eip()) if self.__dbg.connect() == True else None
-		self.__baseAddr    = hex(self.__dbg.get_main_module_base()) if self.__dbg.connect() == True else None
+		self.__ip          = hex(self.__dbg.get_eip()) if self.__status else None
+		self.__baseAddr    = hex(self.__dbg.get_main_module_base()) if self.__status else None
 		self.__breakpoints = []
 
 	def __mappingPhysicalAddress(self, ava):
@@ -244,9 +244,31 @@ class medbg:
 		return phyAddr
 
 	def setBpList(self, bp):
-		bp  = self.__mappingPhysicalAddress(bp)
-		ret = self.__dbg.set_breakpoint(bp)
-		if ret:
-			return True
+		if(self.__status):
+			bp  = self.__mappingPhysicalAddress(bp)
+			ret = self.__dbg.set_breakpoint(bp)
+			if ret:
+				self.__breakpoints.append(bp)
+				return True
+			else:
+				return False
 		else:
 			return False
+
+	def getInstruction(self, bp, nLine = 0):
+		d = []
+		if nLine > 0:
+			dasm = dbg.get_disassembly_count(bp, nLine)
+		else:
+			dasm = self.__dbg.get_disassembly_aline(bp)
+		for i in d:
+			d.append({
+				'ADDR'        : dasm['Address'],
+				'INSTRUCTION' : dasm['Assembly'],
+				'SIZE'        : dasm['Size']
+			})
+		return d
+
+	def getBpLines(nLine):
+		for i in self.__breakpoints:
+			getInstruction(i, nLine)
