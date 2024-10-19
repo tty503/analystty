@@ -1,6 +1,4 @@
-# 1. Activar el entorno virtual venv\Scripts\activate
-# 2. Ejecutar el script principal python src\__init__.py
-# ------------------------------------------------------
+# En Windows ejecutar setup.bat
 import pefile
 from tabulate import tabulate
 

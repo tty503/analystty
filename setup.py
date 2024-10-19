@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
-with open(requeriments.txt) as f:
-	requeriments = f.readlines()
+with open("requirements.txt") as f:
+	requirements = f.readlines()
 
 setup(
 	name="analystty",
@@ -8,5 +8,5 @@ setup(
 	description="Analysis automation tests",
 	author="tty503",
 	packages=find_packages(),
-	install_requires=requeriments
+	install_requires=requirements
 )
