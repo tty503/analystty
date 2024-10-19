@@ -92,7 +92,7 @@ if __name__ == "__main__":
     for point in lists:
         ret = test.setBpList(int(point['ADDR'], 16))
         if ret:
-            print(f'{point['NAME']} : OK')
+            print(f"{point['NAME']} : OK")
         else:
             print('ERROR')
 
